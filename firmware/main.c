@@ -111,21 +111,8 @@ static inline void setup_io () {
 int main(void) {
 	setup_io();
 
-	start_output();
-	_delay_ms(500);
-	stop_output();
-	_delay_ms(500);
-	start_output();
-	_delay_ms(500);
-	stop_output();
-	_delay_ms(500);
-	start_output();
-	_delay_ms(500);
-	stop_output();
-	_delay_ms(1000);
-
 	for (;;) {
-		speed = ADC_PERCENT(do_adc(ADC_SPEED)) / (SPEED_MAX - SPEED_MIN) + SPEED_MIN;
+		speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
 		unit  = 1200 / speed;
 
 		if (dot_keying) {
