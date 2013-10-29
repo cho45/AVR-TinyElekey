@@ -36,6 +36,7 @@ unsigned char unit;
 
 volatile unsigned int idle;
 volatile unsigned int timer;
+volatile unsigned int adc_interval;
 
 unsigned short do_adc (unsigned char channel) {
 	unsigned short ret;
@@ -95,7 +96,7 @@ static inline void stop_output() {
 static inline void setup_io () {
 	timer = 0;
 
-	DDRB   = 0b11100111;
+	DDRB   = 0b11100011;
 	PORTB  = 0b00011000;
 
 	TCCR0A = 0b00000000;
@@ -112,11 +113,12 @@ int main(void) {
 	setup_io();
 
 	for (;;) {
-		if (timer % DURATION(1000) == 0) {
+		if (adc_interval > DURATION(1000)) {
 			set_bit(PORTB, PB1);
 			speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
 			clear_bit(PORTB, PB1);
 			unit  = 1200 / speed;
+			adc_interval = 0;
 		}
 
 		if (dot_keying) {
@@ -154,6 +156,7 @@ int main(void) {
 ISR(TIM0_OVF_vect) {
 	timer++;
 	idle++;
+	adc_interval++;
 
 	if (bit_is_clear(PINB, INPUT_DOT)) {
 		dot_keying = 1;
