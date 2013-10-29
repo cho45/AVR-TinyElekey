@@ -3,6 +3,8 @@
 #include <util/delay.h>
 #include <avr/sleep.h>
 
+#define nop asm volatile("nop")
+
 #define INPUT_DOT PB3
 #define INPUT_DASH PB4
 #define OUTPUT_KEY PB0
@@ -19,9 +21,13 @@
 #define set_bit(v, bit)   v |=  (1 << bit)
 
 #define CLOCK_DEVIDE 1.0
-#define TIMER_INTERVAL (1.0 / (F_CPU / CLOCK_DEVIDE / 256) * 1000)
+#define TIMER_INTERVAL (1.0 / (F_CPU / CLOCK_DEVIDE) * 1000)
 #define INTERVAL_UNIT_IN_MS (unsigned int)(1.0 / TIMER_INTERVAL + 0.5)
 #define DURATION(msec) (unsigned int)(msec * INTERVAL_UNIT_IN_MS)
+#define NOW ((timer<<8)|TCNT0)
+
+#define LONG_TIMER_INTERVAL (1.0 / (F_CPU / CLOCK_DEVIDE / 256) * 1000)
+#define LONG_DURATION(msec) (unsigned int)(msec / LONG_TIMER_INTERVAL)
 
 #define TIMER_INTERVAL_UNIT_IN_US (1.0 / (F_CPU / CLOCK_DEVIDE) * 1000)
 
@@ -35,7 +41,7 @@ unsigned char speed;
 unsigned char unit;
 
 volatile unsigned int idle;
-volatile unsigned int timer;
+volatile unsigned char timer;
 volatile unsigned int adc_interval;
 
 unsigned short do_adc (unsigned char channel) {
@@ -47,7 +53,7 @@ unsigned short do_adc (unsigned char channel) {
 		(0<<ADIE)  | // Interrupt Enable
 		001        ; // Prescale
 
-	ADCSRB = 0;
+	//ADCSRB = 0;
 
 	ADMUX =
 		(0<<REFS0) | // Use VCC ref
@@ -69,18 +75,12 @@ unsigned short do_adc (unsigned char channel) {
 
 void delay_ms(unsigned int t) {
 	unsigned int end;
-	cli();
-	end = timer + DURATION(t);
-	while (end < timer) { // end is overflowed?
-		sei();
-		set_sleep_mode(SLEEP_MODE_IDLE);
-		sleep_mode();
-		cli();
+	end = NOW + DURATION(t);
+	while (end < NOW) { // end is overflowed?
+		nop;
 	}
-	sei();
-	while (timer <= end) {
-		set_sleep_mode(SLEEP_MODE_IDLE);
-		sleep_mode();
+	while (NOW <= end) {
+		nop;
 	}
 }
 
@@ -95,8 +95,8 @@ static inline void stop_output() {
 
 static inline void setup_io () {
 	timer = 0;
-	idle  = DURATION(10000);
-	adc_interval = DURATION(1000);
+	idle  = LONG_DURATION(10000);
+	adc_interval = LONG_DURATION(1000);
 
 	DDRB   = 0b11100011;
 	PORTB  = 0b00011000;
@@ -115,7 +115,7 @@ int main(void) {
 	setup_io();
 
 	for (;;) {
-		if (adc_interval >= DURATION(1000)) {
+		if (adc_interval >= LONG_DURATION(1000)) {
 			// ADC 用のボリュームに電圧をかける
 			set_bit(PORTB, PB1);
 			speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
@@ -146,11 +146,11 @@ int main(void) {
 		}
 
 		// 10000msec 経ったらパワーダウン
-		if (idle > DURATION(10000)) {
+		if (idle > LONG_DURATION(10000)) {
 			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 			sleep_mode();
 			timer = 0;
-			adc_interval = DURATION(1000);
+			adc_interval = LONG_DURATION(1000);
 		} else {
 			set_sleep_mode(SLEEP_MODE_IDLE);
 			sleep_mode();

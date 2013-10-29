@@ -1,11 +1,13 @@
 
 DEVICE     = attiny13
-CLOCK      = 600000
+CLOCK      = 128000
 PROGRAMMER = -c avrispmkII -P usb
 OBJECTS    = main.o
 # Use http://www.engbedded.com/fusecalc
-# 600MHz
-FUSES      = -U lfuse:w:0x69:m -U hfuse:w:0xff:m
+# 128kHz
+FUSES      = -U lfuse:w:0x7b:m -U hfuse:w:0xff:m
+# 600kHz
+#FUSES      = -U lfuse:w:0x69:m -U hfuse:w:0xff:m
 # 1.2M
 # FUSES      = -U lfuse:w:0x6a:m -U hfuse:w:0xff:m
 
@@ -15,7 +17,7 @@ else
 COMPILE_OPT = -Os -g3 -gdwarf-2
 endif
 
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
+AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -B 100
 COMPILE = avr-gcc -Wl,--relax,--gc-sections -Wall $(COMPILE_OPT) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -fdata-sections -ffunction-sections -ffreestanding -fno-schedule-insns2 -mcall-prologues -fno-tree-scev-cprop -fno-split-wide-types
 
 # symbolic targets:
