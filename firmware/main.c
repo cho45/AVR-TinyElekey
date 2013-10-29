@@ -112,7 +112,9 @@ int main(void) {
 	setup_io();
 
 	for (;;) {
+		set_bit(PORTB, PB1);
 		speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
+		clear_bit(PORTB, PB1);
 		unit  = 1200 / speed;
 
 		if (dot_keying) {
