@@ -73,8 +73,10 @@ unsigned short do_adc (unsigned char channel) {
 	return ret;
 }
 
+// max 501ms
 void delay_ms(unsigned int t) {
 	unsigned int end;
+	// DURATION(1) が timer でインクリメントされる数よりも小さいと overflow したときおかしくなる
 	end = NOW + DURATION(t);
 	while (end < NOW) { // end is overflowed?
 		nop;
