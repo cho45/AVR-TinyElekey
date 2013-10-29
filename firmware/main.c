@@ -95,6 +95,8 @@ static inline void stop_output() {
 
 static inline void setup_io () {
 	timer = 0;
+	idle  = DURATION(10000);
+	adc_interval = DURATION(1000);
 
 	DDRB   = 0b11100011;
 	PORTB  = 0b00011000;
@@ -113,9 +115,11 @@ int main(void) {
 	setup_io();
 
 	for (;;) {
-		if (adc_interval > DURATION(1000)) {
+		if (adc_interval >= DURATION(1000)) {
+			// ADC 用のボリュームに電圧をかける
 			set_bit(PORTB, PB1);
 			speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
+			// 解除
 			clear_bit(PORTB, PB1);
 			unit  = 1200 / speed;
 			adc_interval = 0;
@@ -146,6 +150,7 @@ int main(void) {
 			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 			sleep_mode();
 			timer = 0;
+			adc_interval = DURATION(1000);
 		} else {
 			set_sleep_mode(SLEEP_MODE_IDLE);
 			sleep_mode();

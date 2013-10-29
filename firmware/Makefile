@@ -1,10 +1,13 @@
 
 DEVICE     = attiny13
-CLOCK      = 1200000
+CLOCK      = 600000
 PROGRAMMER = -c avrispmkII -P usb
 OBJECTS    = main.o
 # Use http://www.engbedded.com/fusecalc
-FUSES      = -U lfuse:w:0x6a:m -U hfuse:w:0xff:m
+# 600MHz
+FUSES      = -U lfuse:w:0x69:m -U hfuse:w:0xff:m
+# 1.2M
+# FUSES      = -U lfuse:w:0x6a:m -U hfuse:w:0xff:m
 
 ifeq ($(RELEASE),1)
 COMPILE_OPT = -Os
