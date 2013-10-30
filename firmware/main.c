@@ -4,6 +4,8 @@
 #include <avr/sleep.h>
 
 #define nop asm volatile("nop")
+#define clear_bit(v, bit) v &= ~(1 << bit)
+#define set_bit(v, bit)   v |=  (1 << bit)
 
 #define INPUT_DOT PB3
 #define INPUT_DASH PB4
@@ -14,38 +16,35 @@
 #define SPEED_MIN 10
 
 #define INHIBIT_RATE 0.3
-#define INHIBIT_TIME(speed) ((unsigned int)(1200 * INHIBIT_RATE) / speed)
-#define INHIBIT_AFTER(speed) ((unsigned int)(1200 * (1 - INHIBIT_RATE)) / speed)
-
-#define clear_bit(v, bit) v &= ~(1 << bit)
-#define set_bit(v, bit)   v |=  (1 << bit)
+#define INHIBIT_TIME(speed) ((uint16_t)(1200 * INHIBIT_RATE) / speed)
+#define INHIBIT_AFTER(speed) ((uint16_t)(1200 * (1 - INHIBIT_RATE)) / speed)
 
 #define CLOCK_DEVIDE 1.0
 #define TIMER_INTERVAL (1.0 / (F_CPU / CLOCK_DEVIDE) * 1000)
-#define INTERVAL_UNIT_IN_MS (unsigned int)(1.0 / TIMER_INTERVAL + 0.5)
-#define DURATION(msec) (unsigned int)(msec * INTERVAL_UNIT_IN_MS)
+#define INTERVAL_UNIT_IN_MS (uint16_t)(1.0 / TIMER_INTERVAL + 0.5)
+#define DURATION(msec) (uint16_t)(msec * INTERVAL_UNIT_IN_MS)
 #define NOW ((timer<<8)|TCNT0)
 
 #define LONG_TIMER_INTERVAL (1.0 / (F_CPU / CLOCK_DEVIDE / 256) * 1000)
-#define LONG_DURATION(msec) (unsigned int)(msec / LONG_TIMER_INTERVAL)
+#define LONG_DURATION(msec) (uint16_t)(msec / LONG_TIMER_INTERVAL)
 
 #define TIMER_INTERVAL_UNIT_IN_US (1.0 / (F_CPU / CLOCK_DEVIDE) * 1000)
 
 #define VCC 3.3
 #define ADC_MAX 1024L
-#define ADC_VOLT(mV) ((unsigned int)(ADC_MAX / (VCC * 1000)) * mV)
+#define ADC_VOLT(mV) ((uint16_t)(ADC_MAX / (VCC * 1000)) * mV)
 #define ADC_PERCENT(result) (result * 100L / ADC_MAX)
 
-unsigned char dot_keying, dash_keying;
-unsigned char speed;
-unsigned char unit;
+uint8_t dot_keying, dash_keying;
+uint8_t speed;
+uint8_t unit;
 
-volatile unsigned int idle;
-volatile unsigned char timer;
-volatile unsigned int adc_interval;
+volatile uint8_t timer;
+volatile uint16_t idle;
+volatile uint16_t adc_interval;
 
-unsigned short do_adc (unsigned char channel) {
-	unsigned short ret;
+uint16_t do_adc (uint8_t channel) {
+	uint16_t ret;
 	ADCSRA =
 		(1<<ADEN)  | // Enable (Turn on ADC)
 		(0<<ADATE) | // Auto Trigger Enable
@@ -73,10 +72,11 @@ unsigned short do_adc (unsigned char channel) {
 	return ret;
 }
 
-// max 501ms
-void delay_ms(unsigned int t) {
-	unsigned int end;
-	// DURATION(1) が timer でインクリメントされる数よりも小さいと overflow したときおかしくなる
+// max 501ms, min 2ms
+void delay_ms(uint16_t t) {
+	uint16_t end;
+	// DURATION(t) が timer でインクリメントされる数よりも小さいと
+	// end が overflow したとき、割込みがかかると余計にループが回ってしまう
 	end = NOW + DURATION(t);
 	while (end < NOW) { // end is overflowed?
 		nop;
@@ -87,11 +87,11 @@ void delay_ms(unsigned int t) {
 }
 
 static inline void start_output() {
-	set_bit(PORTB, OUTPUT_KEY); 
+	set_bit(PORTB, OUTPUT_KEY);
 }
 
 static inline void stop_output() {
-	clear_bit(PORTB, OUTPUT_KEY); 
+	clear_bit(PORTB, OUTPUT_KEY);
 }
 
 
@@ -100,14 +100,25 @@ static inline void setup_io () {
 	idle  = LONG_DURATION(10000);
 	adc_interval = LONG_DURATION(1000);
 
-	DDRB   = 0b11100011;
-	PORTB  = 0b00011000;
+	// 0=INPUT 1=OUTPUT
+	DDRB   = 0b00000011;
+	// 1=PULL-UP
+	PORTB  = 0b11111000;
 
+	// ADC1(PB2) の Digital Input を無効化 (省電力)
+	DIDR0  = (1<<ADC1D);
+
+	// Timer0 を分周なしで有効化
 	TCCR0A = 0b00000000;
 	TCCR0B = 0b00000001;
 
+	// Timer0 割込みを許可
 	TIMSK0  = (1<<TOIE0);
+
+	// Pin-Change Interrupt Enable
+	// パワーダウンからの復帰用
 	GIMSK   = (1<<PCIE);
+	// Paddle 接続ピンを Pin-Change 割込み対象に
 	PCMSK   = 0b00011000;
 
 	sei();
