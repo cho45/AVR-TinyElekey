@@ -75,12 +75,10 @@ uint16_t do_adc (uint8_t channel) {
 // max 501ms, min 2ms
 void delay_ms(uint16_t t) {
 	uint16_t end;
-	// DURATION(t) が timer でインクリメントされる数よりも小さいと
-	// end が overflow したとき、割込みがかかると余計にループが回ってしまう
+	cli();
+	timer = 0; TCNT0 = 0;
 	end = NOW + DURATION(t);
-	while (end < NOW) { // end is overflowed?
-		nop;
-	}
+	sei();
 	while (NOW <= end) {
 		nop;
 	}
@@ -160,9 +158,9 @@ int main(void) {
 
 		// 10000msec 経ったらパワーダウン
 		if (idle > LONG_DURATION(10000)) {
+			timer = 0;
 			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 			sleep_mode();
-			timer = 0;
 			adc_interval = LONG_DURATION(1000);
 		} else {
 			set_sleep_mode(SLEEP_MODE_IDLE);
