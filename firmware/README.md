@@ -16,7 +16,7 @@ The CW electric keyer with ATTiny13A (8pin)
 
 - パワーダウンモード 0.0uA未満
 - アイドル中 90uA
-- キーイング中 198uA with FET
+- キーイング中 113uA with FET
 
 リチウムコイン電池あたりを使うことを考えると、
 
@@ -41,7 +41,7 @@ function days (opts) {
 
 console.log(days({
 	using_time : 2,
-	using_time_current : 0.38,
+	using_time_current : 0.113,
 	stand_by_current : 0.0006,
 	capacity : 225
 }));

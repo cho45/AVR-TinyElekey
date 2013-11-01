@@ -101,7 +101,7 @@ static inline void setup_io () {
 	// 0=INPUT 1=OUTPUT
 	DDRB   = 0b00000011;
 	// 1=PULL-UP
-	PORTB  = 0b11111000;
+	PORTB  = 0b11100000;
 
 	// ADC1(PB2) の Digital Input を無効化 (省電力)
 	DIDR0  = (1<<ADC1D);

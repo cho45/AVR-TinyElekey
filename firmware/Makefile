@@ -10,6 +10,8 @@ FUSES      = -U lfuse:w:0x7b:m -U hfuse:w:0xff:m
 #FUSES      = -U lfuse:w:0x69:m -U hfuse:w:0xff:m
 # 1.2M
 # FUSES      = -U lfuse:w:0x6a:m -U hfuse:w:0xff:m
+# 4.8MHz
+# FUSES      = -U lfuse:w:0x79:m -U hfuse:w:0xff:m
 
 ifeq ($(RELEASE),1)
 COMPILE_OPT = -Os
