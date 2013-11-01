@@ -16,7 +16,7 @@ The CW electric keyer with ATTiny13A (8pin)
 
 - パワーダウンモード 0.0uA未満
 - アイドル中 90uA
-- キーイング中 113uA with FET
+- キーイング中 96uA with FET
 
 リチウムコイン電池あたりを使うことを考えると、
 

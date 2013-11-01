@@ -75,13 +75,17 @@ uint16_t do_adc (uint8_t channel) {
 // max 501ms, min 2ms
 void delay_ms(uint16_t t) {
 	uint16_t end;
+	uint16_t end0;
 	cli();
 	timer = 0; TCNT0 = 0;
 	end = NOW + DURATION(t);
+	end0 = end - 0x100;
 	sei();
-	while (NOW <= end) {
-		nop;
+	while (NOW <= end0) {
+		set_sleep_mode(SLEEP_MODE_IDLE);
+		sleep_mode();
 	}
+	while (NOW <= end) { }
 }
 
 static inline void start_output() {
