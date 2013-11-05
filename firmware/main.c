@@ -49,7 +49,7 @@ uint16_t do_adc (uint8_t channel) {
 		(1<<ADEN)  | // Enable (Turn on ADC)
 		(0<<ADATE) | // Auto Trigger Enable
 		(0<<ADIF)  | // Interrupt Flag
-		(0<<ADIE)  | // Interrupt Enable
+		(1<<ADIE)  | // Interrupt Enable
 		001        ; // Prescale
 
 	//ADCSRB = 0;
@@ -61,7 +61,8 @@ uint16_t do_adc (uint8_t channel) {
 
 	// START
 	set_bit(ADCSRA, ADSC); 
-	while (bit_is_set(ADCSRA, ADSC));
+	set_sleep_mode(SLEEP_MODE_ADC);
+	while (bit_is_set(ADCSRA, ADSC)) sleep_mode();
 
 	// Read ADCL first, it locks ADCH register until ADCH is read.
 	ret = (ADCL) | ((ADCH) << 8);
@@ -71,6 +72,8 @@ uint16_t do_adc (uint8_t channel) {
 
 	return ret;
 }
+
+ISR(ADC_vect) { }
 
 // max 501ms, min 2ms
 void delay_ms(uint16_t t) {
@@ -190,7 +193,3 @@ ISR(TIM0_OVF_vect) {
 ISR(PCINT0_vect) {
 	idle = 0;
 }
-
-ISR(ADC_vect) {
-}
-
