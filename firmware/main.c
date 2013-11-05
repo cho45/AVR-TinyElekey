@@ -75,7 +75,7 @@ uint16_t do_adc (uint8_t channel) {
 
 ISR(ADC_vect) { }
 
-// max 501ms, min 2ms
+// max 501ms
 void delay_ms(uint16_t t) {
 	uint16_t end;
 	uint16_t end0;
