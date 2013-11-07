@@ -7,10 +7,11 @@
 #define clear_bit(v, bit) v &= ~(1 << bit)
 #define set_bit(v, bit)   v |=  (1 << bit)
 
-#define INPUT_DOT PB3
-#define INPUT_DASH PB4
-#define OUTPUT_KEY PB0
-#define ADC_SPEED 1
+#define INPUT_DOT PB0
+#define INPUT_DASH PB1
+#define OUTPUT_KEY PB2
+#define ADC_VR PB3
+#define ADC_SPEED 2
 
 #define SPEED_MAX 30
 #define SPEED_MIN 10
@@ -106,12 +107,12 @@ static inline void setup_io () {
 	adc_interval = LONG_DURATION(1000);
 
 	// 0=INPUT 1=OUTPUT
-	DDRB   = 0b00000011;
+	DDRB   = (1<<OUTPUT_KEY)|(1<<ADC_VR);
 	// 1=PULL-UP
-	PORTB  = 0b11100000;
+	PORTB  = 0b00000000;
 
-	// ADC1(PB2) の Digital Input を無効化 (省電力)
-	DIDR0  = (1<<ADC1D);
+	// ADC2(PB4) の Digital Input を無効化 (省電力)
+	DIDR0  = (1<<ADC2D);
 
 	// Timer0 を分周なしで有効化
 	TCCR0A = 0b00000000;
@@ -124,7 +125,7 @@ static inline void setup_io () {
 	// パワーダウンからの復帰用
 	GIMSK   = (1<<PCIE);
 	// Paddle 接続ピンを Pin-Change 割込み対象に
-	PCMSK   = 0b00011000;
+	PCMSK   = (1<<PCINT1)|(1<<PCINT0);
 
 	sei();
 }
@@ -135,10 +136,10 @@ int main(void) {
 	for (;;) {
 		if (adc_interval >= LONG_DURATION(1000)) {
 			// ADC 用のボリュームに電圧をかける
-			set_bit(PORTB, PB1);
+			set_bit(PORTB, ADC_VR);
 			speed = ADC_PERCENT(do_adc(ADC_SPEED)) * (SPEED_MAX - SPEED_MIN) / 100 + SPEED_MIN;
 			// 解除
-			clear_bit(PORTB, PB1);
+			clear_bit(PORTB, ADC_VR);
 			unit  = 1200 / speed;
 			adc_interval = 0;
 		}
