@@ -53,7 +53,7 @@
 <layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="98" name="Guide" color="6" fill="1" visible="no" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="200" name="200bmp" color="1" fill="10" visible="no" active="no"/>
 </layers>
 <schematic xreflabel="%F%N/%S.%C%R" xrefpart="/%S.%C%R">
@@ -5791,6 +5791,7 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 <part name="ISP" library="avr-7" deviceset="AVR-ISP-6" device="VERT"/>
 <part name="ZD1" library="diode" deviceset="ZPD" device="" value="5V"/>
 <part name="ZD2" library="diode" deviceset="ZPD" device="" value="5V"/>
+<part name="R2" library="r-j" deviceset="R-" device="1/4W-02.54-V" value="150"/>
 </parts>
 <sheets>
 <sheet>
@@ -5814,7 +5815,7 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 <attribute name="VALUE" x="73.914" y="61.849" size="1.778" layer="96"/>
 </instance>
 <instance part="R1" gate="R" x="50.8" y="43.18" smashed="yes" rot="R270">
-<attribute name="NAME" x="52.07" y="41.6306" size="1.778" layer="95"/>
+<attribute name="NAME" x="52.324" y="41.6306" size="1.778" layer="95"/>
 <attribute name="VALUE" x="55.626" y="41.656" size="1.778" layer="96"/>
 </instance>
 <instance part="INPUT" gate="G$1" x="-12.7" y="38.1" rot="MR0"/>
@@ -5850,6 +5851,10 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 <instance part="ZD2" gate="G$1" x="2.54" y="30.48" smashed="yes" rot="R90">
 <attribute name="NAME" x="0.889" y="26.162" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="0.889" y="31.75" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R2" gate="R" x="50.8" y="55.88" smashed="yes" rot="R270">
+<attribute name="NAME" x="44.45" y="56.8706" size="1.778" layer="95"/>
+<attribute name="VALUE" x="44.45" y="54.102" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -5940,18 +5945,15 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 </net>
 <net name="N$4" class="0">
 <segment>
-<pinref part="Q1" gate="G$1" pin="G"/>
-<wire x1="53.34" y1="48.26" x2="50.8" y2="48.26" width="0.1524" layer="91"/>
-<pinref part="R1" gate="R" pin="1"/>
-<junction x="50.8" y="48.26"/>
 <pinref part="IC1" gate="G$1" pin="(SCK)PB2"/>
-<wire x1="50.8" y1="48.26" x2="50.8" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="73.66" x2="33.02" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="ISP" gate="G$1" pin="3"/>
 <wire x1="33.02" y1="73.66" x2="27.94" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="91.44" x2="33.02" y2="91.44" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="91.44" x2="33.02" y2="73.66" width="0.1524" layer="91"/>
 <junction x="33.02" y="73.66"/>
+<pinref part="R2" gate="R" pin="1"/>
+<wire x1="50.8" y1="60.96" x2="50.8" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -5970,7 +5972,7 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 <pinref part="IC1" gate="G$1" pin="(ADC2)PB4"/>
 </segment>
 </net>
-<net name="N$8" class="0">
+<net name="N$11" class="0">
 <segment>
 <pinref part="INPUT" gate="G$1" pin="2"/>
 <wire x1="-7.62" y1="35.56" x2="2.54" y2="35.56" width="0.1524" layer="91"/>
@@ -6024,6 +6026,15 @@ diameter 2 mm, horizontal, grid 10.16mm</description>
 <junction x="-2.54" y="43.18"/>
 <pinref part="ZD1" gate="G$1" pin="C"/>
 <wire x1="-2.54" y1="33.02" x2="-2.54" y2="43.18" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$8" class="0">
+<segment>
+<pinref part="Q1" gate="G$1" pin="G"/>
+<wire x1="53.34" y1="48.26" x2="50.8" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="R1" gate="R" pin="1"/>
+<pinref part="R2" gate="R" pin="2"/>
+<wire x1="50.8" y1="48.26" x2="50.8" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
