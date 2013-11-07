@@ -1,5 +1,3 @@
-TinyEleKey
-==========
 
 The CW electric keyer with ATTiny13A (8pin)
 
@@ -15,8 +13,8 @@ The CW electric keyer with ATTiny13A (8pin)
 ベース部分 (3.0V)
 
 - パワーダウンモード 0.0uA未満
-- アイドル中 90uA
-- キーイング中 96uA with FET
+- アイドル中 95uA
+- キーイング中 95uA with FET
 
 CR2032 (225mAh) 標準で 0.2mA 最大3mA、パルス放電なら15mAまで
 
