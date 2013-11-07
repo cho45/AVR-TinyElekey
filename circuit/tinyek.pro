@@ -2,12 +2,12 @@ EAGLE AutoRouter Statistics:
 
 Job           : /Users/cho45/sketch/avr/TinyEK/circuit/tinyek.brd
 
-Start at      : 22:27:16 (2013/11/07)
-End at        : 22:27:16 (2013/11/07)
+Start at      : 23:57:53 (2013/11/07)
+End at        : 23:57:53 (2013/11/07)
 Elapsed time  : 00:00:00
 
 Signals       :    10   RoutingGrid: 100 mil  Layers: 2
-Connections   :    28   predefined:  22 ( 0 Vias )
+Connections   :    32   predefined:  27 ( 0 Vias )
 
 Router memory :   3120
 
@@ -18,8 +18,8 @@ Number of Ripups  :         0         0         0         0         0         0
 max. Level        :         0         0         0         0         0         0
 max. Total        :         0         0         0         0         0         0
 
-Routed            :         0         6         6         6         6         6
-Vias              :         0         8         8         8         8         8
-Resolution        :    78.6 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
+Routed            :         0         5         5         5         5         5
+Vias              :         0         1         1         1         1         1
+Resolution        :    84.4 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
 Final             : 100.0% finished
